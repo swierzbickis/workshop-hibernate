@@ -4,24 +4,21 @@ import hibernate.model.Actor;
 import hibernate.model.Genre;
 import hibernate.model.Movie;
 import hibernate.repository.*;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.util.List;
 
 
 public class Main {
 
-    public static void main(String[] args) {
-        final SessionFactory sessionFactory = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .addAnnotatedClass(Movie.class)
-                .addAnnotatedClass(Actor.class)
-                .addAnnotatedClass(Genre.class)
-                .buildSessionFactory();
+    private static final String PERSISTENCE_UNIT_NAME = "TestPersistence";
 
-        EntityManager entityManager = sessionFactory.createEntityManager();
+    public static void main(String[] args) {
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        EntityManager entityManager = factory.createEntityManager();
+
         invokeGenreRepository(entityManager);
         invokeActorRepository(entityManager);
         invokeMovieRepository(entityManager);
