@@ -4,10 +4,10 @@ import hibernate.model.Actor;
 import hibernate.model.Genre;
 import hibernate.model.Movie;
 import hibernate.repository.*;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 
@@ -21,14 +21,13 @@ public class Main {
                 .addAnnotatedClass(Genre.class)
                 .buildSessionFactory();
 
-        EntityManager entityManager = sessionFactory.createEntityManager();
-        invokeGenreRepository(entityManager);
-        invokeActorRepository(entityManager);
-        invokeMovieRepository(entityManager);
+        invokeGenreRepository(sessionFactory.openSession());
+        invokeActorRepository(sessionFactory.openSession());
+        invokeMovieRepository(sessionFactory.openSession());
     }
 
-    private static void invokeGenreRepository(EntityManager entityManager) {
-        final GenreRepository genreRepository = new GenreRepositoryImpl(entityManager);
+    private static void invokeGenreRepository(Session session) {
+        final GenreRepository genreRepository = new GenreRepositoryImpl(session);
 
         Genre genre = new Genre("Action", null);
         genreRepository.save(genre);
@@ -37,8 +36,8 @@ public class Main {
         System.out.println(genreRepository.findAll().size());
     }
 
-    private static void invokeActorRepository(EntityManager entityManager) {
-        final ActorRepository actorRepository = new ActorRepositoryImpl(entityManager);
+    private static void invokeActorRepository(Session session) {
+        final ActorRepository actorRepository = new ActorRepositoryImpl(session);
 
         Actor actor = new Actor("John", "Wayne", 1907, null);
         actorRepository.save(actor);
@@ -47,10 +46,10 @@ public class Main {
         System.out.println(actorRepository.findAllWithLastNameEndsWith("ayne"));
     }
 
-    private static void invokeMovieRepository(EntityManager entityManager) {
-        final MovieRepository movieRepository = new MovieRepositoryImpl(entityManager);
-        final GenreRepository genreRepository = new GenreRepositoryImpl(entityManager);
-        final ActorRepository actorRepository = new ActorRepositoryImpl(entityManager);
+    private static void invokeMovieRepository(Session session) {
+        final MovieRepository movieRepository = new MovieRepositoryImpl(session);
+        final GenreRepository genreRepository = new GenreRepositoryImpl(session);
+        final ActorRepository actorRepository = new ActorRepositoryImpl(session);
 
         Genre genre = new Genre("Thriller", null);
         genreRepository.save(genre);

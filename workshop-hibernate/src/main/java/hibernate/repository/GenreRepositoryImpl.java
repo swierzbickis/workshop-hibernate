@@ -1,6 +1,7 @@
 package hibernate.repository;
 
 import hibernate.model.Genre;
+import org.hibernate.Session;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -10,22 +11,22 @@ import java.util.UUID;
 
 public class GenreRepositoryImpl implements GenreRepository {
 
-    private final EntityManager entityManager;
+    private final Session session;
 
-    public GenreRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public GenreRepositoryImpl(Session session) {
+        this.session = session;
     }
 
     public List<Genre> findAll() {
-        return entityManager.createQuery("from genres", Genre.class).getResultList();
+        return session.createQuery("from genres", Genre.class).getResultList();
     }
 
     public Optional<Genre> findById(final UUID id) {
-        return Optional.ofNullable(entityManager.find(Genre.class, id));
+        return Optional.ofNullable(session.find(Genre.class, id));
     }
 
     public List<Genre> findAllByName(String name) {
-        return entityManager.createQuery("SELECT g FROM genres WHERE name = :name", Genre.class)
+        return session.createQuery("SELECT g FROM genres WHERE name = :name", Genre.class)
                 .setParameter("name", name)
                 .getResultList();
     }
@@ -34,11 +35,11 @@ public class GenreRepositoryImpl implements GenreRepository {
     public Genre save(Genre genre) {
         EntityTransaction transaction = null;
         try {
-            transaction = entityManager.getTransaction();
+            transaction = session.getTransaction();
             if (!transaction.isActive()) {
                 transaction.begin();
             }
-            entityManager.persist(genre);
+            session.persist(genre);
             transaction.commit();
             return genre;
         } catch (final Exception e) {
@@ -52,12 +53,12 @@ public class GenreRepositoryImpl implements GenreRepository {
     public void remove(final Genre genre) {
         EntityTransaction transaction = null;
         try {
-            transaction = entityManager.getTransaction();
+            transaction = session.getTransaction();
             if (!transaction.isActive()) {
                 transaction.begin();
             }
 
-            entityManager.remove(genre);
+            session.remove(genre);
             transaction.commit();
         } catch (final Exception e) {
             if (transaction != null) {
